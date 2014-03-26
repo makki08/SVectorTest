@@ -9,16 +9,25 @@ package org.feu.eac;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.lucene.demo.IndexFiles;
+import pitt.search.semanticvectors.CloseableVectorStore;
 import pitt.search.semanticvectors.FlagConfig;
 import pitt.search.semanticvectors.LSA;
+import pitt.search.semanticvectors.LuceneUtils;
 import pitt.search.semanticvectors.Search;
+import pitt.search.semanticvectors.SearchResult;
+import pitt.search.semanticvectors.VectorSearcher;
+import pitt.search.semanticvectors.VectorStoreReader;
 import pitt.search.semanticvectors.VectorStoreTranslater;
+import pitt.search.semanticvectors.vectors.ZeroVectorException;
 
 /**
  *
@@ -83,29 +92,42 @@ public class Controller extends HttpServlet {
         if (request.getParameter("submit") != null && request.getParameter("submit").equals("Submit")) {
             String text =  request.getParameter("input");
             PrintWriter out = response.getWriter();
-            FlagConfig defaultFlagConfig = FlagConfig.getFlagConfig(null);
-
-            String DEFAULT_VECTOR_FILE = "src/test/resources/termvectors.bin";
             
             List<String> strlist = new ArrayList<String>();
+            strlist.add("-queryvectorfile");
+            strlist.add("termvectors.bin");
             strlist.add("-searchvectorfile");
             strlist.add("docvectors.bin");
-            
-            String[] st = text.split("\\s");
+            String[] st = text.trim().split("\\s");
             for(String s : st){
-                strlist.add(s);
+                if(s.equalsIgnoreCase("not"))
+                    continue;
+                else
+                    strlist.add(s);
             }
             String[] strarray = strlist.toArray(new String[0]);
-            Search.main(strarray);
-            out.println(text); 
+            FlagConfig config = FlagConfig.getFlagConfig(strarray);
+            List<SearchResult> results = pitt.search.semanticvectors.Search.RunSearch(config);
+            for (SearchResult result: results) {
+                System.out.println(String.format(
+                        "%f:%s",
+                        result.getScore(),
+                        result.getObjectVector().getObject().toString()));
+                out.println(String.format(
+                        "%f:%s",
+                        result.getScore(),
+                        result.getObjectVector().getObject().toString()));
+            }
+
+            //Search.main(strarray);
         }
         
         if (request.getParameter("train") != null && request.getParameter("train").equals("Train")) {
             FlagConfig defaultFlagConfig = FlagConfig.getFlagConfig(null);
-            String[] indexString = {"-docs", "C:\\Users\\Simaco.Menzon\\Documents\\NetBeansProjects\\SVectorTest\\corpus", "-index", "C:\\Users\\Simaco.Menzon\\Documents\\NetBeansProjects\\SVectorTest\\index"};
+            String[] indexString = {"-docs", "C:\\Users\\makki\\Documents\\GitHub\\SVectorTest\\corpus", "-index", "C:\\Users\\makki\\Documents\\GitHub\\SVectorTest\\index"};
             IndexFiles.main(indexString);
             PrintWriter out = response.getWriter();
-            String[] lsaString = {"-termweight", "idf", "-minfrequency", "2", "-luceneindexpath", "C:\\Users\\Simaco.Menzon\\Documents\\NetBeansProjects\\SVectorTest\\index"};
+            String[] lsaString = {"-termweight", "idf", "-minfrequency", "1", "-maxfrequency", "20", "-luceneindexpath", "C:\\Users\\makki\\Documents\\GitHub\\SVectorTest\\index"};
             LSA.main(lsaString);
             
             VectorStoreTranslater.main(new String[] {"-lucenetotext", "termvectors.bin","termvectorsCheck.txt"});
