@@ -1,0 +1,3 @@
+Biometric Voting System was developed to help minimize the duplication of votes every election held in FEU-East Asia College. It may lessen the time for tallying of votes and will give the members of the organizations and other students to vote for the selection of officers and/or winners.
+The researchers created this system by using C# and MySQL. They used a fingerprint scanner as a main component if the System. With this scanner, the votes will be secured and the voter’s accounts would not be easily accessed by anyone.
+The system was successfully implemented and surveyed by the members and/or students of each organization in school. It was rated very good by the evaluators using FURPS model criteria.
