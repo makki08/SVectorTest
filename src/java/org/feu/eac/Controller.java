@@ -8,11 +8,17 @@ package org.feu.eac;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.lucene.demo.IndexFiles;
+import pitt.search.semanticvectors.FlagConfig;
+import pitt.search.semanticvectors.LSA;
+import pitt.search.semanticvectors.Search;
+import pitt.search.semanticvectors.VectorStoreTranslater;
 
 /**
  *
@@ -77,17 +83,37 @@ public class Controller extends HttpServlet {
         if (request.getParameter("submit") != null && request.getParameter("submit").equals("Submit")) {
             String text =  request.getParameter("input");
             PrintWriter out = response.getWriter();
-            out.println(text);
+            FlagConfig defaultFlagConfig = FlagConfig.getFlagConfig(null);
+
+            String DEFAULT_VECTOR_FILE = "src/test/resources/termvectors.bin";
+            
+            List<String> strlist = new ArrayList<String>();
+            strlist.add("-searchvectorfile");
+            strlist.add("docvectors.bin");
+            
+            String[] st = text.split("\\s");
+            for(String s : st){
+                strlist.add(s);
+            }
+            String[] strarray = strlist.toArray(new String[0]);
+            Search.main(strarray);
+            out.println(text); 
         }
         
         if (request.getParameter("train") != null && request.getParameter("train").equals("Train")) {
+            FlagConfig defaultFlagConfig = FlagConfig.getFlagConfig(null);
             String[] indexString = {"-docs", "C:\\Users\\Simaco.Menzon\\Documents\\NetBeansProjects\\SVectorTest\\corpus", "-index", "C:\\Users\\Simaco.Menzon\\Documents\\NetBeansProjects\\SVectorTest\\index"};
             IndexFiles.main(indexString);
             PrintWriter out = response.getWriter();
+            String[] lsaString = {"-termweight", "idf", "-minfrequency", "2", "-luceneindexpath", "C:\\Users\\Simaco.Menzon\\Documents\\NetBeansProjects\\SVectorTest\\index"};
+            LSA.main(lsaString);
+            
+            VectorStoreTranslater.main(new String[] {"-lucenetotext", "termvectors.bin","termvectorsCheck.txt"});
+            VectorStoreTranslater.main(new String[] {"-lucenetotext", "docvectors.bin","docvectorsCheck.txt"});
+            
             out.println("training..");
         }
-        
-                
+              
     }
 
     /**
