@@ -21,6 +21,13 @@
             <input type="submit" value="Submit" name="submit">
             <input type="submit" value="Train" name="train">
         </form>
-        
+        </br>
+        <h3> Add pre-graded essays to corpus </h3></br>
+        <form action="upload" method="post" enctype="multipart/form-data">
+            
+            <input type="file" name="file" />
+            Grade: <input type="text" name="grade" />
+            <button type="submit" name="addfile" value="Add">Add</button>
+        </form>
     </body>
 </html>

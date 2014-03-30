@@ -4,9 +4,17 @@
         <servlet-name>Controller</servlet-name>
         <servlet-class>org.feu.eac.Controller</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Upload</servlet-name>
+        <servlet-class>org.feu.eac.Upload</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Controller</servlet-name>
         <url-pattern>/Controller</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Upload</servlet-name>
+        <url-pattern>/upload</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
